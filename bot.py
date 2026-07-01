@@ -10,24 +10,20 @@ bot = Bot(token=os.getenv("TELEGRAM_TOKEN"))
 dp = Dispatcher()
 client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
 
-KEYWORDS = ["کمونیسم", "استالین", "لنین", "مارکس", "انقلاب", "پرولتاریا", "سرمایه‌داری", "رفقا", "بورژوازی"]
-
 @dp.message()
 async def handle(message: types.Message):
     if not message.text:
         return
-    txt = message.text.lower()
-    if any(k in txt for k in KEYWORDS):
+    if any(k in message.text.lower() for k in ["کمونیسم", "استالین", "لنین", "مارکس", "انقلاب", "رفقا"]):
         try:
             resp = await client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[{"role": "user", "content": f"به عنوان یک کمونیست زد خنده‌دار ایرانی، با طنز جواب بده:\n\n{message.text}"}],
-                temperature=0.9,
-                max_tokens=150
+                model="llama-3.1-8b-instant",
+                messages=[{"role": "user", "content": f"زد کمونیستی جواب بده:\n{message.text}"}],
+                max_tokens=120
             )
             await message.reply(resp.choices[0].message.content)
-        except:
-            await message.reply("رفقا، حزب مشغول شارژه ☭")
+        except Exception as e:
+            await message.reply("رفقا، حزب crash کرد ☭")
 
 async def main():
     await dp.start_polling(bot)
